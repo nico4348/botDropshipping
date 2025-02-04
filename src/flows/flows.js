@@ -1,6 +1,8 @@
-import { addKeyword, utils, EVENTS } from '@builderbot/bot'
+import { addKeyword, EVENTS } from '@builderbot/bot'
 
-export const welcomeFlow = addKeyword(EVENTS.WELCOME)
+export const welcomeFlow = addKeyword(EVENTS.WELCOME).addAction(async (ctx, { flowDynamic }) => {
+	await flowDynamic('Welcome to the bot')
+})
 
 /*
 const discordFlow = addKeyword('doc').addAnswer(
