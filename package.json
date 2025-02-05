@@ -17,6 +17,7 @@
 		"@formkit/tempo": "^0.1.2",
 		"@prisma/client": "6.1.0",
 		"axios": "^1.7.9",
+		"join": "^3.0.0",
 		"openai": "^4.77.3",
 		"prisma": "^6.1.0"
 	},

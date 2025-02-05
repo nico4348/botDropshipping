@@ -1,8 +1,69 @@
-import { addKeyword, EVENTS } from '@builderbot/bot'
+import { addKeyword, EVENTS, utils } from '@builderbot/bot'
+import { apiFront } from '../openAi/aiFront.js'
+import { getUser, registerUser, updateHistorial } from '../queries/queries.js'
+import { join } from 'path'
 
-export const welcomeFlow = addKeyword(EVENTS.WELCOME).addAction(async (ctx, { flowDynamic }) => {
-	await flowDynamic('Welcome to the bot')
-})
+export const welcomeFlow = addKeyword(EVENTS.WELCOME).addAction(
+	async (ctx, { flowDynamic, gotoFlow, state }) => {
+		const user = await getUser(ctx.from)
+		await state.update({ user })
+
+		if (!user) {
+			await registerUser(ctx.from)
+			let hist = []
+			const random = Math.floor(Math.random() * 2 + 1)
+			console.log(random)
+			if (random == 1) {
+				hist = [
+					{
+						role: 'assistant',
+						content:
+							'***Se acaban de enviar fotos del producto*** (no hay más, el usuario ya vio todas)',
+					},
+				]
+				await updateHistorial(ctx.from, hist)
+				return gotoFlow(mediaFlow)
+			} else {
+				hist = [
+					{
+						role: 'user',
+						content: ctx.body,
+					},
+				]
+				await updateHistorial(ctx.from, hist)
+				await flowDynamic(await apiFront(hist, ctx.from, ctx.body))
+			}
+		} else {
+			await flowDynamic(await apiFront(user.historial, ctx.from, ctx.body))
+		}
+	}
+)
+
+const mediaFlow = addKeyword(utils.setEvent('MEDIA'))
+	.addAnswer(`Send image from Local`, {
+		media: join(process.cwd(), 'assets', 'img1.jpg'),
+	})
+	.addAnswer(`Send image from Local`, {
+		media: join(process.cwd(), 'assets', 'img2.png'),
+	})
+	.addAnswer(`Send image from Local`, {
+		media: join(process.cwd(), 'assets', 'img3.jpg'),
+	})
+	.addAnswer(`Send image from Local`, {
+		media: join(process.cwd(), 'assets', 'img4.png'),
+	})
+	.addAnswer(`Send image from Local`, {
+		media: join(process.cwd(), 'assets', 'img5.jpg'),
+	})
+	.addAnswer(`Send image from Local`, {
+		media: join(process.cwd(), 'assets', 'img6.jpg'),
+	})
+	.addAnswer(`Send image from Local`, {
+		media: join(process.cwd(), 'assets', 'img7.jpg'),
+	})
+	.addAnswer(`Send video from Local`, {
+		media: join(process.cwd(), 'assets', 'vid1.mp4'),
+	})
 
 /*
 const discordFlow = addKeyword('doc').addAnswer(
