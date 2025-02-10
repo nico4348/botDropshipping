@@ -13,7 +13,7 @@ export const welcomeFlow = addKeyword(EVENTS.WELCOME).addAction(
 			let hist = []
 			const random = Math.floor(Math.random() * 2 + 1)
 			console.log(random)
-			if (random == 1) {
+			if (random == 1 && random == 0) {
 				hist = [
 					{
 						role: 'assistant',

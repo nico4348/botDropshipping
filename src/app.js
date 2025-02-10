@@ -8,7 +8,10 @@ const PORT = process.env.PORT ?? 3008
 const main = async () => {
 	const adapterFlow = createFlow([welcomeFlow])
 
-	const adapterProvider = createProvider(Provider)
+	const adapterProvider = createProvider(Provider, {
+		experimentalStore: true, // Significantly reduces resource consumption
+		timeRelease: 86400000, // Cleans up data every 24 hours (in milliseconds)
+	})
 	const adapterDB = new Database({
 		host: process.env.MYSQL_DB_HOST,
 		user: process.env.MYSQL_DB_USER,
