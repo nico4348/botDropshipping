@@ -20,5 +20,6 @@ model User {
   telefono  String?
   direccion String?
   ciudad    String?
+  cantidad  Int?    @default(0)
   historial Json?
 }
