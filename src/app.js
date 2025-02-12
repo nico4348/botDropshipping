@@ -1,12 +1,12 @@
 import { createBot, createProvider, createFlow } from '@builderbot/bot'
 import { MysqlAdapter as Database } from '@builderbot/database-mysql'
 import { BaileysProvider as Provider } from '@builderbot/provider-baileys'
-import { welcomeFlow } from './flows/flows.js'
+import { audioFlow, welcomeFlow } from './flows/flows.js'
 
 const PORT = process.env.PORT ?? 3008
 
 const main = async () => {
-	const adapterFlow = createFlow([welcomeFlow])
+	const adapterFlow = createFlow([welcomeFlow, audioFlow])
 
 	const adapterProvider = createProvider(Provider, {
 		experimentalStore: true, // Significantly reduces resource consumption

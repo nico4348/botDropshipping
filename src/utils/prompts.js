@@ -53,7 +53,8 @@ Copy
 ### 4. **Confirmación de Pedido**
 Para formalizar tu pedido necesitamos:
 
-Nombre completo: 
+Nombre completo:
+Cantidad a llevar:
 Número de contacto:
 Dirección exacta:
 

@@ -6,6 +6,8 @@
 import OpenAI from 'openai'
 import { mainPrompt } from '../utils/prompts.js'
 import { updateHistorial } from '../queries/queries.js'
+import axios from 'axios'
+import { join } from 'path'
 
 const aiFront = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
@@ -20,13 +22,8 @@ const tools = [
 			description: 'Envía fotos/video del producto cuando solicitado',
 			parameters: {
 				type: 'object',
-				properties: {
-					tipo: {
-						type: 'string',
-						enum: ['fotos', 'video'],
-					},
-				},
-				required: ['tipo'],
+				properties: {},
+				required: [],
 			},
 		},
 	},
@@ -45,8 +42,9 @@ const tools = [
 						type: 'string',
 						enum: ['domicilio', 'oficina'],
 					},
+					cantidad: { type: 'number' },
 				},
-				required: ['nombre', 'telefono', 'direccion', 'tipo_envio'],
+				required: ['nombre', 'telefono', 'direccion', 'tipo_envio', 'cantidad'],
 			},
 		},
 	},
@@ -69,7 +67,7 @@ export async function apiFront(conversationHistory, celular, msg) {
 
 		// Manejar llamadas a funciones
 		if (responseMessage.tool_calls) {
-			const toolResponses = await handleTools(responseMessage.tool_calls)
+			const toolResponses = await handleTools(responseMessage.tool_calls, celular)
 			conversationHistory.push(responseMessage)
 			conversationHistory.push(...toolResponses)
 		} else {
@@ -89,7 +87,7 @@ export async function apiFront(conversationHistory, celular, msg) {
 	}
 }
 
-async function handleTools(toolCalls) {
+async function handleTools(toolCalls, celular) {
 	const responses = []
 
 	for (const toolCall of toolCalls) {
@@ -99,7 +97,7 @@ async function handleTools(toolCalls) {
 			let result
 			switch (name) {
 				case 'enviar_material_visual':
-					result = await enviarMaterial(args.tipo)
+					result = await enviarMaterial(celular)
 					break
 				case 'registrar_pedido':
 					result = await registrarPedido(args)
@@ -126,12 +124,28 @@ async function handleTools(toolCalls) {
 	return responses
 }
 
-async function enviarMaterial(tipo) {
-	const medios = {
-		fotos: ['https://ejemplo.com/foto1.jpg', 'https://ejemplo.com/foto2.jpg'],
-		video: 'https://ejemplo.com/video-demo.mp4',
+async function enviarMaterial(celular) {
+	try {
+		await axios.post('http://localhost:3000/v1/messages', {
+			number: celular, // Asegúrate de reemplazar esto con el número real del cliente
+			message: '1',
+			urlMedia: join(process.cwd(), 'assets', 'img1.jpg'), // URL real de tu media
+		})
+		await axios.post('http://localhost:3000/v1/messages', {
+			number: celular, // Asegúrate de reemplazar esto con el número real del cliente
+			message: '2',
+			urlMedia: join(process.cwd(), 'assets', 'img2.png'), // URL real de tu media
+		})
+		await axios.post('http://localhost:3000/v1/messages', {
+			number: celular, // Asegúrate de reemplazar esto con el número real del cliente
+			message: '3',
+			urlMedia: join(process.cwd(), 'assets', 'img3.jpg'), // URL real de tu media
+		})
+		return 'Check, imagenes enviadas'
+	} catch (error) {
+		console.error('Error al enviar material visual:', error)
+		return { success: false, error: 'Error al enviar material visual' }
 	}
-	return { urls: medios[tipo] }
 }
 
 async function registrarPedido(datos) {
