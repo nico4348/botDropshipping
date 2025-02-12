@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id        String  @id @default(nanoid())
-  nombre    String?
-  celular   String  @unique
-  telefono  String?
-  direccion String?
-  ciudad    String?
-  cantidad  Int?    @default(0)
-  historial Json?
+  id         String  @id @default(nanoid())
+  nombre     String?
+  celular    String  @unique
+  telefono   String?
+  direccion  String?
+  tipo_envio String?
+  ciudad     String?
+  cantidad   Int?    @default(0)
+  historial  Json?
 }

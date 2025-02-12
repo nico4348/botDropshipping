@@ -5,7 +5,7 @@
 
 import OpenAI from 'openai'
 import { mainPrompt } from '../utils/prompts.js'
-import { updateHistorial } from '../queries/queries.js'
+import { updateHistorial, updateUser } from '../queries/queries.js'
 import axios from 'axios'
 import { join } from 'path'
 
@@ -31,20 +31,22 @@ const tools = [
 		type: 'function',
 		function: {
 			name: 'registrar_pedido',
-			description: 'Registra los datos del cliente para finalizar la compra',
+			description:
+				'Registra los datos del cliente para finalizar la compra, despues de que el usuario haya confirmado su informacion',
 			parameters: {
 				type: 'object',
 				properties: {
 					nombre: { type: 'string' },
 					telefono: { type: 'string' },
 					direccion: { type: 'string' },
+					ciudad: { type: 'string' },
 					tipo_envio: {
 						type: 'string',
 						enum: ['domicilio', 'oficina'],
 					},
 					cantidad: { type: 'number' },
 				},
-				required: ['nombre', 'telefono', 'direccion', 'tipo_envio', 'cantidad'],
+				required: ['nombre', 'telefono', 'direccion', 'ciudad', 'tipo_envio', 'cantidad'],
 			},
 		},
 	},
@@ -64,12 +66,34 @@ export async function apiFront(conversationHistory, celular, msg) {
 		})
 
 		const responseMessage = completion.choices[0].message
-
+		let toolResponses
 		// Manejar llamadas a funciones
 		if (responseMessage.tool_calls) {
-			const toolResponses = await handleTools(responseMessage.tool_calls, celular)
+			toolResponses = await handleTools(responseMessage.tool_calls, celular)
+			console.log(toolResponses)
 			conversationHistory.push(responseMessage)
 			conversationHistory.push(...toolResponses)
+			if (toolResponses[0].name == 'registrar_pedido') {
+				const msg =
+					'Tu pedido de la cámara retrovisor quedó registrado\n\nRecibirás confirmación vía WhatsApp antes del despacho. 📦✅'
+				conversationHistory.push({
+					role: 'user',
+					content: msg,
+				})
+				conversationHistory.shift() // Remover system prompt temporal
+				await updateHistorial(celular, conversationHistory)
+				return msg
+			} else {
+				const msg =
+					'Ahi te envie algunas fotos, Si tienes alguna duda sobre las caracteristicas me avisas'
+				conversationHistory.push({
+					role: 'user',
+					content: msg,
+				})
+				conversationHistory.shift() // Remover system prompt temporal
+				await updateHistorial(celular, conversationHistory)
+				return msg
+			}
 		} else {
 			conversationHistory.push({
 				role: 'assistant',
@@ -79,8 +103,7 @@ export async function apiFront(conversationHistory, celular, msg) {
 
 		conversationHistory.shift() // Remover system prompt temporal
 		await updateHistorial(celular, conversationHistory)
-
-		return responseMessage.content || 'Pedido procesado correctamente ✅'
+		return responseMessage.content
 	} catch (error) {
 		console.error('Error en apiFront:', error)
 		return 'Ocurrió un error, por favor intenta nuevamente'
@@ -100,7 +123,7 @@ async function handleTools(toolCalls, celular) {
 					result = await enviarMaterial(celular)
 					break
 				case 'registrar_pedido':
-					result = await registrarPedido(args)
+					result = await registrarPedido(celular, args)
 					break
 			}
 
@@ -148,11 +171,14 @@ async function enviarMaterial(celular) {
 	}
 }
 
-async function registrarPedido(datos) {
-	// Lógica para guardar en tu base de datos
-	console.log('Pedido registrado:', datos)
-	return {
-		success: true,
-		orderId: `ORD-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+// eslint-disable-next-line no-unused-vars
+async function registrarPedido(cel, datos) {
+	datos = JSON.parse(datos)
+	try {
+		await updateUser(cel, datos)
+		return { success: true, message: 'Pedido registrado exitosamente' }
+	} catch (error) {
+		console.error('Error al registrar pedido:', error)
+		return { success: false, error: 'Error al registrar pedido' }
 	}
 }

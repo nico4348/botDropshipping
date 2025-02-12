@@ -61,7 +61,7 @@ Dirección exacta:
 ¿Podrías compartirnos estos datos? 😊
 
 Copy
-→ Validar que todos los datos estén completos
+→ Validar que todos los datos estén completos, mostrar los datos y esperar verificacion del usuario
 
 ---
 

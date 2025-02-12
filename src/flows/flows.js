@@ -31,7 +31,7 @@ export const welcomeFlow = addKeyword(EVENTS.WELCOME).addAction(
 export const audioFlow = addKeyword(EVENTS.VOICE_NOTE)
 	.addAction(async (ctx, { flowDynamic }) => {
 		// Mensaje inicial o acción personalizada
-		await flowDynamic('¡Gracias por tu nota de voz! Procesando...')
+		await flowDynamic('')
 	})
 	.addAnswer({ capture: true }, async (ctx, { flowDynamic, provider, state }) => {
 		try {
