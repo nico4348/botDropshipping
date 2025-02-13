@@ -18,8 +18,10 @@
 		"@prisma/client": "6.1.0",
 		"axios": "^1.7.9",
 		"join": "^3.0.0",
+		"node-cron": "^3.0.3",
 		"openai": "^4.77.3",
-		"prisma": "^6.1.0"
+		"prisma": "^6.1.0",
+		"xlsx": "^0.18.5"
 	},
 	"devDependencies": {
 		"eslint-plugin-builderbot": "latest",

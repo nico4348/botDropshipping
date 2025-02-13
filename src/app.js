@@ -2,6 +2,7 @@ import { createBot, createProvider, createFlow } from '@builderbot/bot'
 import { MysqlAdapter as Database } from '@builderbot/database-mysql'
 import { BaileysProvider as Provider } from '@builderbot/provider-baileys'
 import { audioFlow, welcomeFlow } from './flows/flows.js'
+import { scheduleExportAndSend } from './excel/excel.js'
 
 const PORT = process.env.PORT ?? 3008
 
@@ -63,6 +64,9 @@ const main = async () => {
 			return res.end(JSON.stringify({ status: 'ok', number, intent }))
 		})
 	)
+	// Programar la tarea de exportación y envío cada 12 horas
+	const numberToSend = '573022949109'
+	scheduleExportAndSend(numberToSend)
 
 	httpServer(+PORT)
 }

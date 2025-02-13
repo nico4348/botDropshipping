@@ -66,12 +66,9 @@ Copy
 ---
 
 ### 5. **Cierre de Venta**
-¡Gracias [Nombre del Cliente]! 🙏🏽
-Tu pedido de la cámara retrovisor quedó registrado para enviar a [Ciudad].
+¡De nada, [Nombre del Cliente]! Es un placer ayudarte. Si en el futuro tienes alguna otra consulta o necesitas más productos, no dudes en contactarme. 
 
-Recibirás confirmación vía WhatsApp antes del despacho. 📦✅
-
-¿Necesitas ayuda con algo más hoy? 😊
+Te deseo un excelente día y que disfrutes de tu nueva cámara retrovisor. ¡Hasta pronto! 🚗🔒
 
 Copy
 
